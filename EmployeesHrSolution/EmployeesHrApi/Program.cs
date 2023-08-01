@@ -1,3 +1,4 @@
+using AutoMapper;
 using EmployeesHrApi.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,17 @@ builder.Services.AddDbContext<EmployeeDataContext>(options =>
 {
     options.UseSqlServer(employeesConnectionString);
 });
+
+var mapperConfig = new MapperConfiguration(opt =>
+{
+    opt.AddProfile<EmployeesHrApi.AutomapperProfiles.Employees>();
+    opt.AddProfile<EmployeesHrApi.AutomapperProfiles.HiringRequestProfile>();
+});
+
+var mapper = mapperConfig.CreateMapper();
+
+builder.Services.AddSingleton<IMapper>(mapper);
+builder.Services.AddSingleton<MapperConfiguration>(mapperConfig);
 
 var app = builder.Build();
 
