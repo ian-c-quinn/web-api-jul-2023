@@ -9,16 +9,50 @@ namespace EmployeesHrApi.Controllers
     {
 
         private readonly EmployeeDataContext _context;
+        private readonly ILogger<EmployeesController> _logger;
 
-        public EmployeesController(EmployeeDataContext context)
+        public EmployeesController(EmployeeDataContext context, ILogger<EmployeesController> logger)
         {
+            _logger = logger;
             _context = context;
         }
 
-        [HttpGet("/employees")]
-        public async Task<ActionResult> GetEmployeesAsync()
+        [HttpGet("/employees/{employeeId:int}")]
+        public async Task<ActionResult> GetAnEmployeeAsync(int employeeId)
         {
-            var employees = await _context.Employees.Select(emp => new EmployeesSummaryResponseModel
+            _logger.LogInformation("Got the following employeeId {0}", employeeId);
+            var employee = await _context.Employees
+            .Where(e => e.Id == employeeId)
+            .Select(e => new EmployeeDetailsResponseModel
+            {
+                Id = e.Id.ToString(),
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Department = e.Department,
+                Email = e.Email,
+                PhoneExtension = e.PhoneExtensions
+            })
+            .SingleOrDefaultAsync();
+
+
+
+            if (employee is null)
+            {
+                return NotFound(); // 404
+            }
+            else
+            {
+                return Ok(employee);
+            }
+
+
+
+        }
+
+        [HttpGet("/employees")]
+        public async Task<ActionResult> GetEmployeesAsync([FromQuery] string department = "All")
+        {
+            var employees = await _context.GetEmployeesByDepartment(department).Select(emp => new EmployeesSummaryResponseModel
             {
               Id = emp.Id.ToString(),
               FirstName = emp.FirstName,
@@ -27,8 +61,12 @@ namespace EmployeesHrApi.Controllers
               Email = emp.Email,
             }).ToListAsync();
 
-
-            return Ok(employees);
+            var response = new EmployeesResponseModel
+            {
+                Employees = employees,
+                ShowingDepartment = department
+            };
+            return Ok(response);
         }
     }
 }
