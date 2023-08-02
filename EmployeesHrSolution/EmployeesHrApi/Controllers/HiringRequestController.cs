@@ -31,7 +31,8 @@ namespace EmployeesHrApi.Controllers
             // 3. Return a 201 Created Status Code 
             //   - Add Header "Location" - with the Url of the new resource.
             //   - Return them a copy of the new resource
-            return Ok(newHiringRequest);
+            var response = _mapper.Map<HiringRequestResponseModel>(newHiringRequest);
+            return Ok(response);
         }
     }
 }

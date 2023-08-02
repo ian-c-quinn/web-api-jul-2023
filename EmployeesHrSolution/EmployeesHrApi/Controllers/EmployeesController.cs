@@ -48,7 +48,7 @@ namespace EmployeesHrApi.Controllers
         }
 
         [HttpGet("/employees")]
-        public async Task<ActionResult> GetEmployeesAsync([FromQuery] string department = "All")
+        public async Task<ActionResult<EmployeesResponseModel>> GetEmployeesAsync([FromQuery] string department = "All")
         {
             var employees = await _context.GetEmployeesByDepartment(department)
                 .ProjectTo<EmployeesSummaryResponseModel>(_config)

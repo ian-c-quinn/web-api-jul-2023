@@ -1,5 +1,4 @@
-﻿using EmployeesHrApi.Data;
-
+﻿
 namespace EmployeesHrApi.Models;
 
 public record EmployeesResponseModel
